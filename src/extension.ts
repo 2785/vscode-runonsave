@@ -13,16 +13,25 @@ export function activate(context: vscode.ExtensionContext): void {
 		disposeStatus.dispose();
 	});
 
-	vscode.commands.registerCommand('extension.emeraldwalk.enableRunOnSave', () => {
+	vscode.commands.registerCommand('extension.2785.enableRunOnSave', () => {
 		extension.isEnabled = true;
 	});
 
-	vscode.commands.registerCommand('extension.emeraldwalk.disableRunOnSave', () => {
+	vscode.commands.registerCommand('extension.2785.disableRunOnSave', () => {
 		extension.isEnabled = false;
 	});
 
-	vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-		extension.runCommands(document);
+	vscode.workspace.onWillSaveTextDocument((document: vscode.TextDocumentWillSaveEvent) => {
+		if (document.reason === vscode.TextDocumentSaveReason.Manual) {
+			console.log('RunOnSave: Manual save. Triggering');
+			document.waitUntil(new Promise((resolve, reject) => {
+				extension.runCommands(document.document);
+				resolve(null);
+			}))
+			return;
+		}
+		
+		return;
 	});
 }
 
@@ -127,7 +136,7 @@ class RunOnSaveExtension {
 	}
 
 	public loadConfig(): void {
-		this._config = <IConfig><any>vscode.workspace.getConfiguration('emeraldwalk.runonsave');
+		this._config = <IConfig><any>vscode.workspace.getConfiguration('2785.runonsave');
 	}
 
 	/**
